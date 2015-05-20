@@ -116,14 +116,12 @@ $ python ./%(prog)s <mode> <path>"""
             target_data['srcpath'] = srcname
             target_data['hash'] = hashlib.md5(open(imgpath).read()).hexdigest() if os.path.exists(imgpath) else 'z'*32
             target_data['headers'] = getHeaders(target, srcpath, timeout)
-            #SJ edit
+            #edit
             if get_status(target + '/robots.txt') == 200:
                try:
                    robots = requests.get(target + "/robots.txt", verify=False)
-                   print robots.headers['content-type'].split(';',2)
 		   if robots.headers['content-type'].split(';',2)[0] == "text/plain":        
                        robotText = robots.text.encode('utf-8')
-                       #robots2 = robotText.splitlines()
                        target_data['robots'] = robotText
                    else:
                        target_data['robots'] = "empty robots.txt"
@@ -151,13 +149,11 @@ $ python ./%(prog)s <mode> <path>"""
 # SUPPORT FUNCTIONS
 #=================================================
 
-#SJ edit - check up
+#Check up
 
 def get_status(target):
     try:
       conn = urllib2.urlopen(target, timeout = 2)
-      print target
-      print conn.code
       return conn.code
     except urllib2.URLError as e:
       return 123
