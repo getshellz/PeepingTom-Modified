@@ -116,12 +116,14 @@ $ python ./%(prog)s <mode> <path>"""
             target_data['srcpath'] = srcname
             target_data['hash'] = hashlib.md5(open(imgpath).read()).hexdigest() if os.path.exists(imgpath) else 'z'*32
             target_data['headers'] = getHeaders(target, srcpath, timeout)
-            #edit
+            #SJ edit
             if get_status(target + '/robots.txt') == 200:
                try:
                    robots = requests.get(target + "/robots.txt", verify=False)
+                   print robots.headers['content-type'].split(';',2)
 		   if robots.headers['content-type'].split(';',2)[0] == "text/plain":        
                        robotText = robots.text.encode('utf-8')
+                       #robots2 = robotText.splitlines()
                        target_data['robots'] = robotText
                    else:
                        target_data['robots'] = "empty robots.txt"
@@ -149,11 +151,13 @@ $ python ./%(prog)s <mode> <path>"""
 # SUPPORT FUNCTIONS
 #=================================================
 
-#Check up
+#SJ edit - check up
 
 def get_status(target):
     try:
       conn = urllib2.urlopen(target, timeout = 2)
+      print target
+      print conn.code
       return conn.code
     except urllib2.URLError as e:
       return 123
@@ -248,22 +252,26 @@ def buildReport(db, outfile):
     dead_markup = ''
     # process markup for live targets
     for live in sorted(db['targets'], key=lambda k: k['hash']):
-        live_markup += "<tr><td class='img'><a href='{0}' target='_blank'><img src='{0}' onerror=\"this.parentNode.parentNode.innerHTML='No image available.';\" /></a></td><td class='head'><a href='{1}' target='_blank'>{1}</a> (<a href='{2}' target='_blank'>source</a>)<br /><pre>{3}</pre><pre><p>{4}</p></pre></td></tr>\n".format(live['imgpath'],live['url'],live['srcpath'],live['headers'],live['robots'])#SJ edit addded robots
+        live_markup += "<tr><td class='tg-0ord'><a href='{0}' target='_blank'><img src='{0}' onerror=\"this.parentNode.parentNode.innerHTML='No image available.';\" /></a></td><td class='tg-0ord'><a href='{1}' target='_blank'>{1}</a> (<a href='{2}' target='_blank'>source</a>)<br/><pre>{3}</pre><pre><p>{4}</p></pre></td></tr>\n".format(live['imgpath'],live['url'],live['srcpath'],live['headers'],live['robots']) #addded robots
     # add markup to the report
     file = open(outfile, 'w')
     file.write("""
 <!doctype html>
 <head>
-<style>
-table, td, th {border: 1px solid black;border-collapse: collapse;padding: 5px;font-size: .9em;font-family: tahoma;}
-table {width: 100%%;table-layout: fixed;min-width: 1000px;}
-td.img {width: 40%%;}
-img {width: 100%%;}
-td.head {vertical-align: top;word-wrap: break-word;}
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#ccc;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
+.tg .tg-0ord{text-align:left;background-color:#f0f0f0;}
+.tg .tg-s6z2{text-align:center;background-color:#c0c0c0;}
 </style>
 </head>
 <body>
-<table>
+<table class="tg">
+<tr>
+    <th class="tg-s6z2">Screenshot</th>
+    <th class="tg-s6z2">Details</th>
+  </tr>
 %s
 </table>
 </body>
